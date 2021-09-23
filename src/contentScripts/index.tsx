@@ -4,6 +4,22 @@ import UrlPattern from "url-pattern";
 import * as modules from "./modules";
 import { InjectFunction } from "./module";
 
+declare global {
+  interface Window {
+    toggleIcon(i: string): void;
+    $: any;
+    mapMarkers: any;
+    mapSandbox: any;
+    circle: any;
+    quick_deploy: any;
+    map: any;
+    onCameraChanged: any;
+    mapboxgl: any;
+    username: any;
+    htmlrep: any;
+  }
+}
+
 const randID = () => Math.floor(Math.random() * 100000).toString();
 
 const callbacks: { [id: string]: (v: any) => void } = {};

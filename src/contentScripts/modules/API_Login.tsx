@@ -1,5 +1,5 @@
 import { BrowseModuleClass } from "../module";
-import React from "react";
+import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 
 function friendlyErrorMessage(errorMessage: string) {
@@ -15,51 +15,50 @@ function friendlyErrorMessage(errorMessage: string) {
   return errorMessage;
 }
 
-function LoginPage({
+function LoginPage({ errorMessage }: { errorMessage: string | null }) {
+  return (
+    <div
+      style={{ minHeight: "100vh" }}
+      className="d-flex flex-column justify-content-center align-items-center">
+      <div className="card p-4 d-flex flex-column">
+        <img
+          src="https://munzee.global.ssl.fastly.net/images/munzee-logo.svg"
+          style={{ maxHeight: 100, maxWidth: "90%" }}
+          className="align-self-center pb-2"
+        />
+        {errorMessage && (
+          <div className="alert alert-danger" role="alert">
+            {friendlyErrorMessage(errorMessage)}
+          </div>
+        )}
+        <form className="d-flex flex-column" method="POST">
+          <legend>Sign in</legend>
+          <div className="mb-3">
+            <label htmlFor="usernameInput" className="form-label">
+              Username
+            </label>
+            <input type="text" className="form-control" id="usernameInput" name="username" />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="passwordInput" className="form-label">
+              Password
+            </label>
+            <input type="password" className="form-control" id="passwordInput" name="password" />
+          </div>
+          <input className="align-self-end btn btn-success" type="submit" value="Login" />
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function ApprovalPage({
   username,
   applicationName,
-  errorMessage,
 }: {
-  username: string | null;
-  errorMessage: string | null;
+  username: string;
   applicationName: string;
-  }) {
-  if (!username) {
-    return (
-      <div
-        style={{ minHeight: "100vh" }}
-        className="d-flex flex-column justify-content-center align-items-center">
-        <div className="card p-4 d-flex flex-column">
-          <img
-            src="https://munzee.global.ssl.fastly.net/images/munzee-logo.svg"
-            style={{ maxHeight: 100, maxWidth: "90%" }}
-            className="align-self-center pb-2"
-          />
-          {errorMessage && (
-            <div className="alert alert-danger" role="alert">
-              {friendlyErrorMessage(errorMessage)}
-            </div>
-          )}
-          <form className="d-flex flex-column" method="POST">
-            <legend>Sign in</legend>
-            <div className="mb-3">
-              <label htmlFor="usernameInput" className="form-label">
-                Username
-              </label>
-              <input type="text" className="form-control" id="usernameInput" name="username" />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="passwordInput" className="form-label">
-                Password
-              </label>
-              <input type="password" className="form-control" id="passwordInput" name="password" />
-            </div>
-            <input className="align-self-end btn btn-success" type="submit" value="Login" />
-          </form>
-        </div>
-      </div>
-    );
-  }
+}) {
   return (
     <div
       style={{ minHeight: "100vh" }}
@@ -70,11 +69,6 @@ function LoginPage({
           style={{ width: 64, height: 64, borderRadius: 32 }}
           className="align-self-center m-2"
         />
-        {errorMessage && (
-          <div className="alert alert-danger" role="alert">
-            {friendlyErrorMessage(errorMessage)}
-          </div>
-        )}
         <h4 className="text-center">{applicationName}</h4>
         <h6 className="text-center">wants to access your Munzee Account</h6>
         <small className="text-center">
@@ -159,94 +153,30 @@ export class APILoginModule extends BrowseModuleClass {
   }
 
   async execute() {
-    const query = document.querySelectorAll("p:nth-child(2) strong");
-    const username = query.length === 1 ? null : query[0].innerHTML;
-    const applicationName = (query[1] ?? query[0]).innerHTML;
-    console.log(username, applicationName);
+    let renderPage: ReactElement | null = null;
+    if (location.href.includes("oauth/authorize")) {
+      const query = document.querySelectorAll("p:nth-child(2) strong");
+      const username = query[0].innerHTML;
+      const applicationName = query[1].innerHTML;
+      renderPage = (
+        <ApprovalPage username={username ?? "N/A"} applicationName={applicationName} />
+      );
+    } else if(location.href.includes("oauth/signin")) {
+      const errorMessage =
+        Array.from(document.querySelectorAll<HTMLElement>("p")).find(
+          i => i.style.color === "rgb(255, 0, 0)"
+        )?.innerText ?? null;
+      renderPage = <LoginPage errorMessage={errorMessage} />;
+    }
 
-    // document.querySelectorAll<HTMLInputElement>("form input").forEach(i => {
-    //   if (i.type === "submit") {
-    //     i.classList.add("btn");
-    //     if (i.value.includes("Do Not")) {
-    //       i.classList.add("btn-dark");
-    //     } else {
-    //       i.classList.add("btn-success");
-    //     }
-    //   } else {
-    //     i.classList.add("form-control");
-    //   }
-    // });
-
-    // document.querySelectorAll<HTMLElement>("p strong").forEach(i => {
-    //   if (i.innerText === "Please sign in:") {
-    //     i.outerHTML = `<h4>Sign In</h4>`;
-    //   }
-    // });
-
-    // document.querySelectorAll<HTMLElement>("li i").forEach(i => {
-    //   if (i.innerText.includes("read all data")) {
-    //     i.innerText = `Read data that you can access with your Munzee account`;
-    //   }
-    // });
-
-    const errorMessage =
-      Array.from(document.querySelectorAll<HTMLElement>("p")).find(
-        i => i.style.color === "rgb(255, 0, 0)"
-      )?.innerText ?? null;
-
-    // document.querySelectorAll<HTMLElement>("p").forEach(i => {
-    //   if (i.style.color === "rgb(255, 0, 0)") {
-    //     i.classList.add("alert", "alert-danger");
-    //     i.style.color = ""
-    //   }
-    //   if (i.innerText.includes("please enter your username")) {
-    //     i.innerText = "Please enter your username";
-    //   }
-    //   if (i.innerText.includes("please enter your password")) {
-    //     i.innerText = "Please enter your password";
-    //   }
-    //   if (i.innerText.includes("either username or password are not valid")) {
-    //     i.innerText = "Invalid username or password";
-    //   }
-    //   if (i.innerText.includes("would like to access") && window.location.href.includes("/signin")) {
-    //     i.style.display = "none";
-    //   }
-    //   if (i.innerText.includes("will be able to:")) {
-    //     i.outerHTML = "";
-    //     // i.innerHTML = `By pressing Allow Access, you will allow <b>${applicationName}</b> to:`;
-    //   }
-    //   if (i.innerText.includes("You are not ")) {
-    //     i.outerHTML = `<a class="btn btn-sm btn-outline-secondary" href="/oauth/signout">Switch Account</a>` + (username ? `<p class="pt-2"><i><small>You can revoke ${applicationName}'s access to your Munzee Account at any time by visiting <a href="https://www.munzee.com/revoke">https://www.munzee.com/revoke</a>.</small></i></p>` : "");
-    //   }
-    //   if (i.innerText.includes("would like to access your munzee.com")) {
-    //     if (username) {
-    //     i.outerHTML = `
-    //     <h3 class="m-0">${applicationName}</h3>
-    //     <h5 class="m-0">wants to access your Munzee account</h5>
-    //     <p class="m-0">You are signed it as <b>${username}</b>. <small><a href="/oauth/signout">Switch Account</a></small></p>
-    //     <p>
-    //       Howdy <b>${username}</b>, <b>${applicationName}</b> would like to access your Munzee Account.<br/>By pressing Allow Access, you will allow <b>${applicationName}</b> to:
-    //     </p>`;
-    //     } else {
-    //       i.outerHTML = "";
-    //     }
-    //   }
-    // });
-
-    //  TODO: Page-specific rendering
-    const appDiv = document.createElement("div");
-    appDiv.id = "app";
-    document.body.innerHTML = "";
-    document.body.appendChild(appDiv);
-    ReactDOM.render(
-      <LoginPage
-        username={username}
-        applicationName={applicationName}
-        errorMessage={errorMessage}
-      />,
-      appDiv
-    );
-
-    this.injectStyles();
+    if (renderPage) {
+      const appDiv = document.createElement("div");
+      appDiv.id = "app";
+      document.body.innerHTML = "";
+      document.body.appendChild(appDiv);
+      ReactDOM.render(renderPage, appDiv);
+      
+      this.injectStyles();
+    }
   }
 }
