@@ -124,30 +124,6 @@ export class APILoginModule extends BrowseModuleClass {
       body {
         background: #00C35B url("https://server.cuppazee.app/LoginBackground.png");
       }
-      /** {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      }
-      h3, h2, p {
-        text-align: center;
-      }
-      body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      img {
-        max-height: 60px;
-        max-width: 90%;
-        width: auto !important;
-      }
-      li {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }*/
-      /*form > p {
-        font-size: 1.3rem;
-      }/*
     </style>
   `;
   }
