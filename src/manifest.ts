@@ -44,6 +44,7 @@ export async function getManifest() {
     }],
     web_accessible_resources: [
       'dist/contentScripts/style.css',
+      // 'dist/contentScripts/modules.js',
     ],
   }
 

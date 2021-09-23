@@ -1,33 +1,96 @@
 /* eslint-disable no-console */
-import { onMessage } from "webext-bridge";
-import React from "react";
-import ReactDOM from "react-dom";
-import browser from "webextension-polyfill";
-import App from "./pages/App";
+import UrlPattern from "url-pattern";
+
+import * as modules from "./modules";
+import { InjectFunction } from "./module";
+
+const randID = () => Math.floor(Math.random() * 100000).toString();
+
+const callbacks: { [id: string]: (v: any) => void } = {};
+const functionIDs = new Map<unknown, string>();
+
+function injectNewFunction(id: string, func: Function) {
+  const script = document.createElement("script");
+  script.textContent = `window.__CZ__BROWSEACTIONS["${id}"] = ${func
+    .toString()
+    .replace(/^async [^(\s]+\(([^)]*)\)/, "async ($1) => ")
+    .replace(/^[^(\s]+\(([^)]*)\)/, "($1) => ")}`;
+  document.body.appendChild(script);
+}
+
+const injectFunction: InjectFunction = func => {
+  if (!functionIDs.has(func)) {
+    functionIDs.set(func, randID());
+    injectNewFunction(functionIDs.get(func) ?? "", func);
+  }
+  return ((...data: any[]) =>
+    new Promise(resolve => {
+      const funcId = functionIDs.get(func);
+      const id = randID();
+      window.postMessage({
+        type: "FROM_CZ__BROWSE",
+        function: funcId,
+        data: data.map(i => {
+          if (i && typeof i === "function") {
+            const s = randID();
+            callbacks[s] = i;
+            return { type: "CALLBACK", value: s };
+          }
+          return { type: "VALUE", value: i };
+        }),
+        id,
+      });
+      callbacks[id] = resolve;
+    })) as any;
+};
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
-(() => {
-  console.info("[vitesse-webext] Hello world from content script");
-
-  // communication example: send previous tab title from background page
-  onMessage("tab-prev", ({ data }) => {
-    console.log(`[vitesse-webext] Navigate from page "${data.title}"`);
+(async () => {
+  window.addEventListener("message", function (event) {
+    if (event.data.type === "FROM_PAGE") {
+      if (callbacks[event.data.id]) {
+        callbacks[event.data.id](event.data.data);
+      }
+    }
   });
 
-  // mount component to context window
-  const container = document.createElement("div");
-  const root = document.createElement("div");
-  const styleEl = document.createElement("link");
-  const shadowDOM = container.attachShadow?.({ mode: __DEV__ ? "open" : "closed" }) || container;
-  styleEl.setAttribute("rel", "stylesheet");
-  styleEl.setAttribute("href", browser.runtime.getURL("dist/contentScripts/style.css"));
-  shadowDOM.appendChild(styleEl);
-  shadowDOM.appendChild(root);
-  document.body.appendChild(container);
-  ReactDOM.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-    root
-  );
+  const mods = Object.values(modules);
+
+  const script = document.createElement("script");
+  const textContent = `window.__CZ__BROWSEACTIONS = {};
+window.addEventListener("message", async (event) => {
+  // We only accept messages from ourselves
+  if (event.source != window) {
+    return;
+  }
+
+  if (event.data.type && (event.data.type === "FROM_CZ__BROWSE")) {
+    window.postMessage({type: "FROM_PAGE", id: event.data.id, data: await __CZ__BROWSEACTIONS[event.data.function](...event.data.data.map(i => {
+      if(i.type === "CALLBACK") {
+        return (data) => {
+          window.postMessage({type: "FROM_PAGE", id: i.value, data: data, callback: true});
+        }
+      }
+      return i.value;
+    }))})
+  }
+}, false);`;
+  script.textContent = textContent;
+  document.body.appendChild(script);
+
+  for (const modClass of mods) {
+    try {
+      const mod = new modClass(injectFunction);
+      const script = document.createElement("script");
+      script.textContent = `console.log(\`${mod.name}, ${mod.urls}\`)`;
+      document.body.appendChild(script);
+      if (mod.urls.some(url => new UrlPattern(url).match(location.href))) {
+        await mod.execute();
+      }
+    } catch (e: any) {
+      const script = document.createElement("script");
+      script.textContent = `console.error(\`${e.toString().replace("`", "\\`")}\`)`;
+      document.body.appendChild(script);
+    }
+  }
 })();
