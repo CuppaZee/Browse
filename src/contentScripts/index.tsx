@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 import UrlPattern from "url-pattern";
 
-import * as modules from "./modules";
-import { InjectFunction } from "./module";
+import * as pluginsObject from "../plugins/_plugins";
+import { BrowseContentPlugin, InjectFunction } from "../plugins/_plugin";
+import { getFromStorage } from "~/logic";
+import { loadDB } from "~/logic/db";
 
 declare global {
   interface Window {
@@ -70,8 +72,6 @@ const injectFunction: InjectFunction = func => {
     }
   });
 
-  const mods = Object.values(modules);
-
   const script = document.createElement("script");
   const textContent = `window.__CZ__BROWSEACTIONS = {};
 window.addEventListener("message", async (event) => {
@@ -94,14 +94,27 @@ window.addEventListener("message", async (event) => {
   script.textContent = textContent;
   document.body.appendChild(script);
 
-  for (const modClass of mods) {
+  const db = await loadDB();
+
+  const enabledPlugins =
+    (await getFromStorage<{ [key: string]: boolean }>("@czbrowse/plugins/enabled")) ?? {};
+
+  const plugins: BrowseContentPlugin[] = [];
+  for (const pluginName in pluginsObject) {
+    const pluginClass = pluginsObject[pluginName as keyof typeof pluginsObject];
+
+    if (pluginClass.TYPE === "content") {
+      plugins.push(new pluginClass(injectFunction, db));
+    }
+  }
+
+  for (const plugin of plugins) {
     try {
-      const mod = new modClass(injectFunction);
-      const script = document.createElement("script");
-      script.textContent = `console.log(\`${mod.name}, ${mod.urls}\`)`;
-      document.body.appendChild(script);
-      if (mod.urls.some(url => new UrlPattern(url).match(location.href))) {
-        await mod.execute();
+      if (
+        (enabledPlugins[plugin.id] ?? plugin.defaultOn) &&
+        plugin.urls.some(url => new UrlPattern(url).match(location.href))
+      ) {
+        await plugin.execute();
       }
     } catch (e: any) {
       const script = document.createElement("script");

@@ -1,8 +1,8 @@
-import { BrowseModuleClass } from "../module";
+import { BrowseContentPlugin } from "../_plugin";
 
-export class SandboxModule extends BrowseModuleClass {
-  name = "Sandbox";
-  id = "sandbox";
+export class MapSandboxPlugin extends BrowseContentPlugin {
+  name = "Better Map Sandbox";
+  id = "mapsandbox";
   urls = ["*.munzee.com/map*"];
 
   async setupSandbox() {
@@ -84,7 +84,7 @@ export class SandboxModule extends BrowseModuleClass {
               }"><img id="newcheckimg_${i.split("|")[1]}" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${i.split("|")[0]}.png" /><br/><span style="color:red" id="newchecktext_${i.split("|")[1]}">${i.split("|")[2]}</span></div>`;
             })
             .join("");
-          
+
           if (window.innerWidth > 500)
             itemContent += `<br /><div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:green;">Capture Areas</div>${captureAreas}</div>`;
 

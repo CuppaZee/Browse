@@ -10,7 +10,11 @@ export default defineConfig({
   build: {
     watch: isDev
       ? {
-          include: [r("src/contentScripts/**/*"), r("src/components/**/*")],
+          include: [
+            r("src/contentScripts/**/*"),
+            r("src/components/**/*"),
+            r("src/plugins/**/*"),
+          ],
         }
       : undefined,
     outDir: r("extension/dist/contentScripts"),

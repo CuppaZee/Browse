@@ -1,9 +1,10 @@
-import { BrowseModuleClass } from "../module";
+import { BrowseContentPlugin } from "../_plugin";
 
-export class VGPExpansionModule extends BrowseModuleClass {
-  name = "Garden Painter Expansion";
+export class VGPExpansionPlugin extends BrowseContentPlugin {
+  name = "CuppaZee Expansion Pack";
   id = "vgp_expansion";
   urls = ["*gardenpainter.ide.sk/*"];
+  category = "Virtual Garden Painter";
 
   async injectTypes(data: any) {
     const w = window as any;
@@ -116,7 +117,9 @@ body.darkMap img[src="cross.png"] {
 
   async checkForLegacyScript() {
     if (
-      Array.from(document.querySelectorAll(".maptilesbtn")).find(i => (i as any).innerText.includes("Wiki"))
+      Array.from(document.querySelectorAll(".maptilesbtn")).find(i =>
+        (i as any).innerText.includes("Wiki")
+      )
     ) {
       alert(
         "The VGP Satellite Userscript is no longer supported. Please disable that Userscript and enabled the VGP CuppaZee Expansion Pack userscript instead."
@@ -222,7 +225,6 @@ body.darkMap img[src="cross.png"] {
 
     this.inject(this.injectMapStyles)();
 
-
-    this.checkForLegacyScript()
+    this.checkForLegacyScript();
   }
 }

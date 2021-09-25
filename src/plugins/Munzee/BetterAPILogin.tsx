@@ -1,4 +1,4 @@
-import { BrowseModuleClass } from "../module";
+import { BrowseContentPlugin } from "../_plugin";
 import React, { ReactElement } from "react";
 import ReactDOM from "react-dom";
 
@@ -111,8 +111,8 @@ function ApprovalPage({
   );
 }
 
-export class APILoginModule extends BrowseModuleClass {
-  name = "Refined API Login";
+export class APILoginPLugin extends BrowseContentPlugin {
+  name = "Better API Login";
   id = "apilogin";
   urls = ["*api.munzee.com/oauth/*"];
 
@@ -134,10 +134,8 @@ export class APILoginModule extends BrowseModuleClass {
       const query = document.querySelectorAll("p:nth-child(2) strong");
       const username = query[0].innerHTML;
       const applicationName = query[1].innerHTML;
-      renderPage = (
-        <ApprovalPage username={username ?? "N/A"} applicationName={applicationName} />
-      );
-    } else if(location.href.includes("oauth/signin")) {
+      renderPage = <ApprovalPage username={username ?? "N/A"} applicationName={applicationName} />;
+    } else if (location.href.includes("oauth/signin")) {
       const errorMessage =
         Array.from(document.querySelectorAll<HTMLElement>("p")).find(
           i => i.style.color === "rgb(255, 0, 0)"
@@ -151,7 +149,7 @@ export class APILoginModule extends BrowseModuleClass {
       document.body.innerHTML = "";
       document.body.appendChild(appDiv);
       ReactDOM.render(renderPage, appDiv);
-      
+
       this.injectStyles();
     }
   }

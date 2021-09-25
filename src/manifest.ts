@@ -17,13 +17,14 @@ export async function getManifest() {
       default_icon: './assets/icon-512.png',
       default_popup: './dist/popup/index.html',
     },
-    options_ui: {
-      page: './dist/options/index.html',
-      open_in_tab: true,
-      chrome_style: false,
-    },
+    // options_ui: {
+    //   page: './dist/options/index.html',
+    //   open_in_tab: true,
+    //   chrome_style: false,
+    // },
     background: {
       page: './dist/background/index.html',
+      // scripts: ["./dist/background/main.js"],
       persistent: false,
     },
     icons: {
@@ -35,6 +36,7 @@ export async function getManifest() {
       'tabs',
       'storage',
       'activeTab',
+      'webRequest',
       'http://*/',
       'https://*/',
     ],
@@ -44,7 +46,6 @@ export async function getManifest() {
     }],
     web_accessible_resources: [
       'dist/contentScripts/style.css',
-      // 'dist/contentScripts/modules.js',
     ],
   }
 

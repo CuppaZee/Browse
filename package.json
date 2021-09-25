@@ -28,6 +28,7 @@
     "@iconify/json": "^1.1.398",
     "@svgr/core": "^5.5.0",
     "@types/fs-extra": "^9.0.12",
+    "@types/latlon-geohash": "^2.0.0",
     "@types/node": "^16.7.13",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
@@ -52,11 +53,14 @@
     "vite": "^2.5.4",
     "vite-plugin-windicss": "^1.4.3",
     "web-ext": "^6.3.0",
-    "webext-bridge": "^4.1.1",
+    "webext-bridge": "^5.0.0",
     "webextension-polyfill": "^0.8.0",
     "windicss": "^3.1.7"
   },
   "dependencies": {
+    "@cuppazee/db": "^0.0.8",
+    "dayjs": "^1.10.7",
+    "latlon-geohash": "^2.0.0",
     "url-pattern": "^1.0.3"
   }
 }
