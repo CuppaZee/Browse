@@ -7,3 +7,4 @@ export * from "./VGP/CuppaZeeExpansion";
 export * from "./Munzee/CoordinateInsert";
 export * from "./Munzee/BetterConvert";
 export * from "./Munzee/CuppaZeeIcons";
+// export * from "./MapRewrite/Plugin";

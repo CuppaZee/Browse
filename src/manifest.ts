@@ -14,8 +14,8 @@ export async function getManifest() {
     version: pkg.version,
     description: pkg.description,
     browser_action: {
-      default_icon: './assets/icon-512.png',
-      default_popup: './dist/popup/index.html',
+      default_icon: "./assets/icon-512.png",
+      default_popup: "./dist/popup/index.html",
     },
     // options_ui: {
     //   page: './dist/options/index.html',
@@ -23,31 +23,33 @@ export async function getManifest() {
     //   chrome_style: false,
     // },
     background: {
-      page: './dist/background/index.html',
+      page: "./dist/background/index.html",
       // scripts: ["./dist/background/main.js"],
-      persistent: false,
+      persistent: true,
     },
     icons: {
-      16: './assets/icon-512.png',
-      48: './assets/icon-512.png',
-      128: './assets/icon-512.png',
+      16: "./assets/icon-512.png",
+      48: "./assets/icon-512.png",
+      128: "./assets/icon-512.png",
     },
     permissions: [
-      'tabs',
-      'storage',
-      'activeTab',
-      'webRequest',
-      'http://*/',
-      'https://*/',
+      "tabs",
+      "storage",
+      "activeTab",
+      "webRequest",
+      "webRequestBlocking",
+      "http://*/",
+      "https://*/",
     ],
-    content_scripts: [{
-      matches: ['http://*/*', 'https://*/*'],
-      js: ['./dist/contentScripts/index.global.js'],
-    }],
-    web_accessible_resources: [
-      'dist/contentScripts/style.css',
+    content_scripts: [
+      {
+        matches: ["http://*/*", "https://*/*"],
+        js: ["./dist/contentScripts/index.global.js"],
+      },
     ],
-  }
+    web_accessible_resources: ["dist/contentScripts/style.css", "dist/plugins/MapRewrite/index.html"],
+    content_security_policy: "script-src 'self' https://example.com blob:; object-src 'self'"
+  };
 
   if (isDev) {
     // for content script, as browsers will cache them for each reload,

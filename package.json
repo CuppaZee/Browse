@@ -61,6 +61,8 @@
     "@cuppazee/db": "^0.0.8",
     "dayjs": "^1.10.7",
     "latlon-geohash": "^2.0.0",
+    "mapbox-gl": "^2.4.1",
+    "react-map-gl": "^6.1.17",
     "url-pattern": "^1.0.3"
   }
 }

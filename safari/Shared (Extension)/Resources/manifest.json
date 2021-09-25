@@ -9,7 +9,7 @@
   },
   "background": {
     "page": "./dist/background/index.html",
-    "persistent": false
+    "persistent": true
   },
   "icons": {
     "16": "./assets/icon-512.png",
@@ -37,6 +37,8 @@
     }
   ],
   "web_accessible_resources": [
-    "dist/contentScripts/style.css"
-  ]
+    "dist/contentScripts/style.css",
+    "dist/plugins/MapRewrite/index.html"
+  ],
+  "content_security_policy": "script-src 'self' https://example.com blob:; object-src 'self'"
 }
