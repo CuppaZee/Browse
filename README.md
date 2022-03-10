@@ -1,7 +1,29 @@
 # CuppaZee Browse
 
 Based on [`vite-react-webext`](https://github.com/sohcah/vite-react-webext)
-### Development
+
+## Building for Firefox
+
+Assuming PNPM and NodeJS are installed on your machine:
+
+### Install Dependencies
+```
+pnpm install
+```
+
+### Build Extension
+```
+pnpm run build_v2
+```
+
+### Pack Extension
+```
+pnpm run pack
+```
+
+You can now find the output in `extension.zip` and `extension.xpi`.
+
+## Development
 
 ```bash
 pnpm dev
@@ -19,7 +41,7 @@ pnpm start:firefox
 
 > While Vite handles HMR automatically in the most of the case, [Extensions Reloader](https://chrome.google.com/webstore/detail/fimgfedafeadlieiabdeeaodndnlbhid) is still recommanded for cleaner hard reloading.
 
-### Build
+## Build
 
 To build the extension, run
 
