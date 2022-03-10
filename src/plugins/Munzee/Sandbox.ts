@@ -11,7 +11,7 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
     $("#showSBbuttons").click(function () {
       setTimeout(function () {
         $('[id*="SB"]').removeClass("hidden-xs");
-        const { mapSandbox, map, onCameraChanged, mapboxgl, circle, quick_deploy } = window as any;
+        const { mapSandbox, map, onCameraChanged, maplibregl, circle, quick_deploy } = window as any;
         mapSandbox.createItemElement = function (item: any) {
           var imageurl = "https://i.ibb.co/3RKyg0m/Grey-Single-Surprise.png";
           // var fn = htmlrep(username);
@@ -41,16 +41,18 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
         mapSandbox.circles.joystickScatter = { radius: 457.2, color: "#b50087" };
         mapSandbox.circles.joystickSecondScatter = { radius: 213.36, color: "#8800b5" };
         mapSandbox.circles.capturePOI = { radius: 304.8, color: "#ff5500" };
+        mapSandbox.circles.cardArea = { radius: 152.4, color: "#f54446" };
         mapSandbox.showItemPopup = function (item: any) {
           map.panTo(item.coordinates);
           onCameraChanged();
           this.removePopup();
           this.selectedId = item.id;
 
-          this.itemPopup = new mapboxgl.Popup({
+          this.itemPopup = new maplibregl.Popup({
             closeButton: false,
             offset: 10,
             anchor: window.innerWidth > 500 ? "left" : "top",
+            maxWidth: 400,
           });
 
           var itemContent = "<section id='createNewItem' style='text-align:center;'>";
@@ -77,16 +79,23 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
             "virtual|captureArea|Virtual",
             "poi_filter|capturePOI|POI",
             "blast_capture|blastArea|Blast",
+            "envelope|cardArea|Card",
           ]
             .map(function (i) {
               return `<div style="display:inline-block;padding:4px;" id="newcheck_${
                 i.split("|")[1]
-              }"><img id="newcheckimg_${i.split("|")[1]}" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${i.split("|")[0]}.png" /><br/><span style="color:red" id="newchecktext_${i.split("|")[1]}">${i.split("|")[2]}</span></div>`;
+              }"><img id="newcheckimg_${
+                i.split("|")[1]
+              }" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${
+                i.split("|")[0]
+              }.png" /><br/><span style="color:var(--cz-mapsandbox-off, red)" id="newchecktext_${
+                i.split("|")[1]
+              }">${i.split("|")[2]}</span></div>`;
             })
             .join("");
 
           if (window.innerWidth > 500)
-            itemContent += `<br /><div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:green;">Capture Areas</div>${captureAreas}</div>`;
+            itemContent += `<br /><div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:var(--cz-mapsandbox-captureareas, green);">Capture Areas</div>${captureAreas}</div>`;
 
           var blockAreas = [
             "motel|motelArea|Motel/Trail",
@@ -96,15 +105,22 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
             "vacationcondo|condoArea|Condo",
             "treehouse|treehouseArea|Treehouse",
             "airmystery|airArea|Air Mystery",
+            "sirprizewheel|spwArea|Sir Prize Wheel",
           ]
             .map(function (i) {
               return `<div style="display:inline-block;padding:4px;" id="newcheck_${
                 i.split("|")[1]
-              }"><img id="newcheckimg_${i.split("|")[1]}" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${i.split("|")[0]}.png" /><br/><span style="color:red" id="newchecktext_${i.split("|")[1]}">${i.split("|")[2]}</span></div>`;
+              }"><img id="newcheckimg_${
+                i.split("|")[1]
+              }" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${
+                i.split("|")[0]
+              }.png" /><br/><span style="color:var(--cz-mapsandbox-off, red)" id="newchecktext_${
+                i.split("|")[1]
+              }">${i.split("|")[2]}</span></div>`;
             })
             .join("");
           if (window.innerWidth > 500)
-            itemContent += `<div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:red;">Blocked Areas</div>${blockAreas}</div>`;
+            itemContent += `<div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:var(--cz-mapsandbox-blockedareas, red);">Blocked Areas</div>${blockAreas}</div>`;
 
           var scatterAreas = [
             "scatter|basicScatter|Default",
@@ -116,18 +132,24 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
             .map(function (i) {
               return `<div style="display:inline-block;padding:4px;" id="newcheck_${
                 i.split("|")[1]
-              }"><img id="newcheckimg_${i.split("|")[1]}" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${i.split("|")[0]}.png" /><br/><span style="color:red" id="newchecktext_${i.split("|")[1]}">${i.split("|")[2]}</span></div>`;
+              }"><img id="newcheckimg_${
+                i.split("|")[1]
+              }" style="height:36px;width:36px;filter:grayscale(1) opacity(0.4)" src="https://munzee.global.ssl.fastly.net/images/pins/${
+                i.split("|")[0]
+              }.png" /><br/><span style="color:rvar(--cz-mapsandbox-off, red)" id="newchecktext_${
+                i.split("|")[1]
+              }">${i.split("|")[2]}</span></div>`;
             })
             .join("");
           if (window.innerWidth > 500)
-            itemContent += `<div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:blue;">Scatter Areas</div>${scatterAreas}</div>`;
+            itemContent += `<div style="text-align:center;max-width:300px;"><div style="font-size:1.5em;font-weight:bold;color:var(--cz-mapsandbox-scatterareas, blue);">Scatter Areas</div>${scatterAreas}</div>`;
           itemContent += "</section>";
           this.itemPopup.setLngLat(item.coordinates).setHTML(itemContent).addTo(map);
 
           for (var layer in mapSandbox.list[mapSandbox.selectedId].layers) {
             if (mapSandbox.list[mapSandbox.selectedId].layers[layer]) {
               $("#newcheckimg_" + layer).css("filter", "none");
-              $("#newchecktext_" + layer).css("color", "green");
+              $("#newchecktext_" + layer).css("color", "var(--cz-mapsandbox-on, green)");
             }
           }
 
@@ -150,11 +172,11 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
               if (!mapSandbox.list[mapSandbox.selectedId].layers[layer]) {
                 mapSandbox.drawCircle(mapSandbox.selectedId, layer);
                 $("#newcheckimg_" + layer).css("filter", "none");
-                $("#newchecktext_" + layer).css("color", "green");
+                $("#newchecktext_" + layer).css("color", "var(--cz-mapsandbox-on, green)");
               } else {
                 mapSandbox.removeLayer(mapSandbox.selectedId, layer);
                 $("#newcheckimg_" + layer).css("filter", "grayscale(1) opacity(0.4)");
-                $("#newchecktext_" + layer).css("color", "red");
+                $("#newchecktext_" + layer).css("color", "var(--cz-mapsandbox-on, red)");
               }
             };
           }
@@ -162,6 +184,7 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
           $("#newcheck_captureArea").click(generate("captureArea"));
           $("#newcheck_capturePOI").click(generate("capturePOI"));
           $("#newcheck_blastArea").click(generate("blastArea"));
+          $("#newcheck_cardArea").click(generate("cardArea"));
 
           $("#newcheck_motelArea").click(generate("motelArea"));
           $("#newcheck_hotelArea").click(generate("hotelArea"));
@@ -170,6 +193,7 @@ export class MapSandboxPlugin extends BrowseContentPlugin {
           $("#newcheck_condoArea").click(generate("condoArea"));
           $("#newcheck_treehouseArea").click(generate("treehouseArea"));
           $("#newcheck_airArea").click(generate("airArea"));
+          $("#newcheck_spwArea").click(generate("spwArea"));
 
           $("#newcheck_basicScatter").click(generate("basicScatter"));
           $("#newcheck_catapultScatter").click(generate("catapultScatter"));

@@ -17,6 +17,14 @@ export class DarkStylePlugin extends BrowseContentPlugin {
   async injectStyles() {
     document.head.innerHTML += `
     <style>
+      :root {
+        --cz-redeem-card-bg: #232323;
+        --cz-mapsandbox-off: #ff7777;
+        --cz-mapsandbox-on: #77ff77;
+        --cz-mapsandbox-captureareas: #77ff77;
+        --cz-mapsandbox-scatterareas: #7777ff;
+        --cz-mapsandbox-blockedareas: #ff7777;
+      }
       body {
         background-color: #121212;
         color: white;
@@ -24,8 +32,15 @@ export class DarkStylePlugin extends BrowseContentPlugin {
       .panel-default {
         border-color: #232323;
       }
+      .panel-footer {
+        border-top-color: #121212;
+        background-color: #232323;
+      }
       .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
         border-top: 1px solid #232323;
+      }
+      .table-striped>tbody>tr:nth-child(odd)>td, .table-striped>tbody>tr:nth-child(odd)>th {
+        background-color: #232323;
       }
       a {
         color: #00C35B;
@@ -283,6 +298,20 @@ export class DarkStylePlugin extends BrowseContentPlugin {
 
       #credits-page table {
         background-color: #333;
+      }
+
+      .mapboxgl-popup-content {
+        background-color: #232323;
+      }
+
+      #openquickdeploymodal {
+        background-color: #004400 !important;
+      }
+      #removeFromSB {
+        background-color: #440000 !important;
+      }
+      #removeFromSB:hover, #openquickdeploymodal:hover {
+        color: #fff !important;
       }
     </style>
   `;

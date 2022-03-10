@@ -5,6 +5,7 @@ import * as pluginsObject from "../plugins/_plugins";
 import { BrowseContentPlugin, InjectFunction } from "../plugins/_plugin";
 import { getFromStorage } from "~/logic";
 import { loadDB } from "~/logic/db";
+import ext from "webextension-polyfill";
 
 declare global {
   interface Window {
@@ -28,21 +29,37 @@ const callbacks: { [id: string]: (v: any) => void } = {};
 const functionIDs = new Map<unknown, string>();
 
 function injectNewFunction(id: string, func: Function) {
-  const script = document.createElement("script");
-  script.textContent = `window.__CZ__BROWSEACTIONS["${id}"] = ${func
+  // const script = document.createElement("script");
+  // script.textContent
+  const body = `window.__CZ__BROWSEACTIONS["${id}"] = ${func
     .toString()
     .replace(/^async [^(\s]+\(([^)]*)\)/, "async ($1) => ")
     .replace(/^[^(\s]+\(([^)]*)\)/, "($1) => ")}`;
-  document.body.appendChild(script);
+  // document.body.appendChild(script);
+  window.postMessage({
+    type: "INJECT_CZ__BROWSE",
+    id,
+    body,
+  });
 }
+
+const injectPromises = new Map<string, Promise<void>>();
 
 const injectFunction: InjectFunction = func => {
   if (!functionIDs.has(func)) {
-    functionIDs.set(func, randID());
+    const id = randID();
+    functionIDs.set(func, id);
+    injectPromises.set(
+      functionIDs.get(func)!,
+      new Promise(resolve => {
+        callbacks[`inject__${id}`] = resolve;
+      })
+    );
     injectNewFunction(functionIDs.get(func) ?? "", func);
   }
-  return ((...data: any[]) =>
-    new Promise(resolve => {
+  return (async (...data: any[]) => {
+    await injectPromises.get(functionIDs.get(func) ?? "");
+    return await new Promise(resolve => {
       const funcId = functionIDs.get(func);
       const id = randID();
       window.postMessage({
@@ -59,7 +76,8 @@ const injectFunction: InjectFunction = func => {
         id,
       });
       callbacks[id] = resolve;
-    })) as any;
+    });
+  }) as any;
 };
 
 // Firefox `browser.tabs.executeScript()` requires scripts return a primitive value
@@ -73,25 +91,26 @@ const injectFunction: InjectFunction = func => {
   });
 
   const script = document.createElement("script");
-  const textContent = `window.__CZ__BROWSEACTIONS = {};
-window.addEventListener("message", async (event) => {
-  // We only accept messages from ourselves
-  if (event.source != window) {
-    return;
-  }
+  // const textContent = `window.__CZ__BROWSEACTIONS = {};
+  // window.addEventListener("message", async (event) => {
+  //   // We only accept messages from ourselves
+  //   if (event.source != window) {
+  //     return;
+  //   }
 
-  if (event.data.type && (event.data.type === "FROM_CZ__BROWSE")) {
-    window.postMessage({type: "FROM_PAGE", id: event.data.id, data: await __CZ__BROWSEACTIONS[event.data.function](...event.data.data.map(i => {
-      if(i.type === "CALLBACK") {
-        return (data) => {
-          window.postMessage({type: "FROM_PAGE", id: i.value, data: data, callback: true});
-        }
-      }
-      return i.value;
-    }))})
-  }
-}, false);`;
-  script.textContent = textContent;
+  //   if (event.data.type && (event.data.type === "FROM_CZ__BROWSE")) {
+  //     window.postMessage({type: "FROM_PAGE", id: event.data.id, data: await __CZ__BROWSEACTIONS[event.data.function](...event.data.data.map(i => {
+  //       if(i.type === "CALLBACK") {
+  //         return (data) => {
+  //           window.postMessage({type: "FROM_PAGE", id: i.value, data: data, callback: true});
+  //         }
+  //       }
+  //       return i.value;
+  //     }))})
+  //   }
+  // }, false);`;
+  // script.textContent = textContent;
+  script.src = ext.runtime.getURL("/assets/inject.js");
   document.body.appendChild(script);
 
   const db = await loadDB();
@@ -117,9 +136,13 @@ window.addEventListener("message", async (event) => {
         await plugin.execute();
       }
     } catch (e: any) {
-      const script = document.createElement("script");
-      script.textContent = `console.error(\`${e.toString().replace("`", "\\`")}\`)`;
-      document.body.appendChild(script);
+      window.postMessage({
+        type: "ERROR_CZ__BROWSE",
+        body: e.toString().replace("`", "\\`"),
+      });
+      // const script = document.createElement("script");
+      // script.textContent = `console.error("Script Error", \`${e.toString().replace("`", "\\`")}\`)`;
+      // document.body.appendChild(script);
     }
   }
 })();

@@ -1,4 +1,4 @@
-export type InjectableFunction<A extends any[] = any[], B = any> = (...params: A) => Promise<B>;
+export type InjectableFunction<A extends Promise<any>[] = Promise<any>[], B = any> = (...params: A) => Promise<B>;
 export type InjectFunction = <T extends InjectableFunction>(func: T) => T;
 
 import type { CuppaZeeDB } from "@cuppazee/db";

@@ -1,7 +1,7 @@
 {
   "name": "@cuppazee/browse",
   "displayName": "CuppaZee Browse",
-  "version": "0.0.2",
+  "version": "0.0.7",
   "description": "CuppaZee Browse",
   "private": true,
   "scripts": {
@@ -9,8 +9,10 @@
     "dev:prepare": "esno scripts/prepare.ts",
     "dev:web": "vite",
     "dev:js": "npm run build:js -- --mode development",
-    "build": "cross-env NODE_ENV=production run-s clear build:web build:prepare build:js build:safari",
-    "build:prepare": "esno scripts/prepare.ts",
+    "build_v2": "cross-env NODE_ENV=production run-s clear build:web build:prepare_v2 build:js build:safari",
+    "build_v3": "cross-env NODE_ENV=production run-s clear build:web build:prepare_v3 build:js build:safari",
+    "build:prepare_v2": "esno scripts/prepare.ts",
+    "build:prepare_v3": "esno scripts/prepare.ts --v3",
     "build:web": "vite build",
     "build:js": "vite build --config vite.config.content.ts",
     "build:safari": "cp -r extension/* \"safari/Shared (Extension)/Resources\"",
@@ -58,11 +60,13 @@
     "windicss": "^3.1.7"
   },
   "dependencies": {
+    "@cuppazee/api": "^0.0.13",
     "@cuppazee/db": "^0.0.8",
     "dayjs": "^1.10.7",
     "latlon-geohash": "^2.0.0",
     "mapbox-gl": "^2.4.1",
     "react-map-gl": "^6.1.17",
+    "react-query": "^3.25.1",
     "url-pattern": "^1.0.3"
   }
 }

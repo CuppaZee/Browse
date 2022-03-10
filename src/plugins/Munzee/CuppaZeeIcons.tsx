@@ -6,6 +6,8 @@ export class CuppaZeeIconsPlugin extends BrowseBackgroundPlugin {
   id = "cuppazeeicons";
   urls = ["*www.munzee.com/*", "*/munzee.com/*"];
 
+  defaultOn = false;
+
   listener: any = null;
 
   async start() {
@@ -16,7 +18,7 @@ export class CuppaZeeIconsPlugin extends BrowseBackgroundPlugin {
           redirectUrl: `https://images.cuppazee.app/types/128/${type.strippedIcon}.png`,
         };
       }
-    };;
+    };
     browser.webRequest.onBeforeRequest.addListener(
       this.listener,
       { urls: ["*://munzee.global.ssl.fastly.net/images/pins/*"] },

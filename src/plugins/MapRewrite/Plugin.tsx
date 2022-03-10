@@ -47,7 +47,17 @@ export class MapRewritePlugin extends BrowseContentPlugin {
 
   defaultOn = false;
 
+  async getMapToken() {
+    return (window as any).maptoken;
+  }
+
+  async getCoords() {
+    return { lat: (window as any).coords.lat, lng: (window as any).coords.lng };
+  }
+
   async execute() {
+    const mapToken = await this.inject(this.getMapToken)();
+    const coords = await this.inject(this.getCoords)();
     const mainWrapper = document.querySelector<HTMLElement>("#map-page > .showcase > .row");
     if (mainWrapper) {
       mainWrapper.parentElement!.classList.remove("showcase-top");
@@ -62,8 +72,11 @@ export class MapRewritePlugin extends BrowseContentPlugin {
   id="inlineFrameExample"
   title="Map Rewrite"
   width="100%"
-  height="300px"
-  src="${browser.runtime.getURL("./dist/plugins/MapRewrite/index.html")}#${encodeURIComponent(JSON.stringify({}))}">
+  height="600px"
+  allow="geolocation"
+  src="${browser.runtime.getURL("./dist/plugins/MapRewrite/index.html")}#${encodeURIComponent(
+        JSON.stringify({ mapToken, coords })
+      )}">
 </iframe>`;
     }
   }

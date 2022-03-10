@@ -4,6 +4,8 @@ import fs from "fs-extra";
 import chokidar from "chokidar";
 import { r, port, isDev, log } from "./utils";
 
+const v3 = process.argv.includes("--v3");
+
 /**
  * Stub index.html to use Vite in development
  */
@@ -23,7 +25,7 @@ async function stubIndexHtml() {
 }
 
 function writeManifest() {
-  execSync("npx esno ./scripts/manifest.ts", { stdio: "inherit" });
+  execSync(`npx esno ./scripts/manifest.ts${v3 ? " --v3" : ""}`, { stdio: "inherit" });
 }
 
 writeManifest();
